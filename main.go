@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/ghostec/goge/game"
+	"github.com/ghostec/goge/gameobject"
 	"github.com/ghostec/goge/math"
 	"github.com/ghostec/goge/mesh"
 	"github.com/ghostec/goge/scene"
@@ -14,7 +15,9 @@ func main() {
 	screen := three.NewScreen()
 	scene := scene.New()
 	root := scene.Graph.Root()
-	root.Value = mesh.NewBox(math.Vec3{1, 2, 1})
+	box := gameobject.New()
+	box.Drawable = mesh.NewBox(math.Vec3{1, 2, 1})
+	root.Value = box
 	renderer := three.NewRenderer()
 	renderer.SetCamera(camera)
 	renderer.SetScreen(screen)
