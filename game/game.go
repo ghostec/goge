@@ -4,6 +4,7 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/ghostec/goge/gameobject"
 	"github.com/ghostec/goge/renderer"
 	"github.com/ghostec/goge/scene"
 )
@@ -36,6 +37,7 @@ func (g *Game) Loop() {
 		now = time.Now()
 		elapsed = now.Sub(last)
 		last = now
+		g.updateState(elapsed)
 		g.renderer.Update(elapsed)
 		// guarantees MaxFPS
 		after = time.Now()
@@ -46,6 +48,20 @@ func (g *Game) Loop() {
 			diff = minAfter.Sub(after)
 			last = minAfter
 			time.Sleep(diff)
+		}
+	}
+}
+
+func (g Game) updateState(elapsed time.Duration) {
+	bfs := g.scene.Graph.BFS()
+	for _, node := range bfs {
+		switch v := node.Value.(type) {
+		case *gameobject.GameObject:
+			codeList, ok := v.GetComponent(gameobject.CodeListComponentType)
+			if !ok {
+				continue
+			}
+			codeList.(*gameobject.CodeListComponent).Update(elapsed)
 		}
 	}
 }

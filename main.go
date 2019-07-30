@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	"github.com/ghostec/goge/game"
 	"github.com/ghostec/goge/gameobject"
 	"github.com/ghostec/goge/math"
@@ -18,6 +20,17 @@ func main() {
 	box := gameobject.New()
 	drawable := gameobject.NewDrawableComponent()
 	drawable.Set(mesh.NewBox(math.Vec3{1, 2, 0.5}))
+	codeList := gameobject.NewCodeListComponent()
+	codeFunc := gameobject.NewCodeListComponentFunc(
+		"rotate_cube",
+		func(obj *gameobject.GameObject, elapsed time.Duration) error {
+			// TODO: access gameobject.drawable.(*mesh.Box)
+			// change its Rotate Vec3
+			return nil
+		},
+	)
+	codeList.Add(codeFunc)
+	box.AddComponent(codeList)
 	box.AddComponent(drawable)
 	root.Value = box
 	renderer := three.NewRenderer()

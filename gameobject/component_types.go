@@ -2,5 +2,6 @@ package gameobject
 
 type ComponentType string
 
-const DrawableComponentType = ComponentType("Drawable")
+const CodeListComponentType = ComponentType("CodeList")
 const CustomComponentType = ComponentType("Custom")
+const DrawableComponentType = ComponentType("Drawable")
