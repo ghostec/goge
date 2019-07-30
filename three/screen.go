@@ -2,14 +2,10 @@ package three
 
 import "github.com/gopherjs/gopherjs/js"
 
-type Screen struct {
-	onResizeCallbacks map[string]func()
-}
+type Screen struct{}
 
 func NewScreen() *Screen {
-	return &Screen{
-		onResizeCallbacks: map[string]func(){},
-	}
+	return &Screen{}
 }
 
 func (s Screen) Width() float64 {
@@ -18,8 +14,4 @@ func (s Screen) Width() float64 {
 
 func (s Screen) Height() float64 {
 	return js.Global.Get("innerHeight").Float()
-}
-
-func (s Screen) OnResize(callback func()) func() {
-	return func() {}
 }
