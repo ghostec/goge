@@ -80,7 +80,11 @@ func (r *Renderer) renderNode(node *graph.Node) {
 
 func (r *Renderer) renderGameObjectNode(node *graph.Node) {
 	value := node.Value.(*gameobject.GameObject)
-	switch value.Drawable.(type) {
+	drawable, ok := value.GetComponent(gameobject.DrawableComponentType)
+	if !ok {
+		return
+	}
+	switch drawable.Get().(type) {
 	case *mesh.Box:
 		r.renderMeshBoxNode(node)
 	default:
@@ -90,8 +94,10 @@ func (r *Renderer) renderGameObjectNode(node *graph.Node) {
 }
 
 func (r *Renderer) renderMeshBoxNode(node *graph.Node) {
+	value := node.Value.(*gameobject.GameObject)
+	drawable, _ := value.GetComponent(gameobject.DrawableComponentType)
 	if node.RendererValue == nil {
-		d := node.Value.(*gameobject.GameObject).Drawable.(*mesh.Box).Dimensions
+		d := drawable.Get().(*mesh.Box).Dimensions
 		geometry := THREE().Get("BoxGeometry").New(d.X, d.Y, d.Z)
 		material := THREE().Get("MeshBasicMaterial").New(map[string]interface{}{
 			"color": 0x00ff00,

@@ -16,7 +16,9 @@ func main() {
 	scene := scene.New()
 	root := scene.Graph.Root()
 	box := gameobject.New()
-	box.Drawable = mesh.NewBox(math.Vec3{1, 2, 1})
+	drawable := gameobject.NewDrawableComponent()
+	drawable.Set(mesh.NewBox(math.Vec3{1, 2, 0.5}))
+	box.AddComponent(drawable)
 	root.Value = box
 	renderer := three.NewRenderer()
 	renderer.SetCamera(camera)
