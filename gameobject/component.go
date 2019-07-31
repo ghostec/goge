@@ -1,35 +1,33 @@
 package gameobject
 
+import (
+	"time"
+)
+
 type Component interface {
 	Get() interface{}
 	Set(interface{})
 	Type() ComponentType
-	GameObject() *GameObject
-	SetGameObject(*GameObject)
+	Update(obj *GameObject, elapsed time.Duration)
 }
 
 type CustomComponent struct {
 	value interface{}
 	ct    ComponentType
-	obj   *GameObject
 }
 
-func (cc CustomComponent) Type() ComponentType {
-	return cc.ct
+func (c CustomComponent) Type() ComponentType {
+	return c.ct
 }
 
-func (cc CustomComponent) Get() interface{} {
-	return cc.value
+func (c CustomComponent) Get() interface{} {
+	return c.value
 }
 
-func (cc *CustomComponent) Set(value interface{}) {
-	cc.value = value
+func (c *CustomComponent) Set(value interface{}) {
+	c.value = value
 }
 
-func (cc *CustomComponent) SetGameObject(obj *GameObject) {
-	cc.obj = obj
-}
-
-func (cc CustomComponent) GameObject() *GameObject {
-	return cc.obj
+func (c *CustomComponent) Update(obj *GameObject, elapsed time.Duration) {
+	return
 }

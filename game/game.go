@@ -61,7 +61,7 @@ func (g Game) updateState(elapsed time.Duration) {
 			if !ok {
 				continue
 			}
-			codeList.(*gameobject.CodeListComponent).Update(elapsed)
+			codeList.(*gameobject.CodeListComponent).Update(v, elapsed)
 		}
 	}
 }

@@ -24,7 +24,6 @@ func (o *GameObject) AddComponent(c Component) error {
 		return fmt.Errorf("GameObject %s already has component with type %s", o.uuid, c.Type())
 	}
 	o.components[c.Type()] = c
-	c.SetGameObject(o)
 	return nil
 }
 
@@ -32,7 +31,6 @@ func (o *GameObject) RemoveComponent(c Component) error {
 	if _, ok := o.components[c.Type()]; !ok {
 		return fmt.Errorf("GameObject %s has no component with type %s", o.uuid, c.Type())
 	}
-	c.SetGameObject(nil)
 	delete(o.components, c.Type())
 	return nil
 }

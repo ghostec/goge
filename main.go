@@ -21,15 +21,13 @@ func main() {
 	drawable := gameobject.NewDrawableComponent()
 	drawable.Set(mesh.NewBox(math.Vec3{1, 2, 0.5}))
 	codeList := gameobject.NewCodeListComponent()
-	codeFunc := gameobject.NewCodeListComponentFunc(
-		"rotate_cube",
-		func(obj *gameobject.GameObject, elapsed time.Duration) error {
-			// TODO: access gameobject.drawable.(*mesh.Box)
-			// change its Rotate Vec3
-			return nil
-		},
-	)
-	codeList.Add(codeFunc)
+	code := gameobject.NewSimpleCodeComponent("rotate_cube")
+	code.SetUpdate(func(obj *gameobject.GameObject, elapsed time.Duration) {
+		// TODO: access gameobject.drawable.(*mesh.Box)
+		// change its Rotate Vec3
+		println("here")
+	})
+	codeList.Add(code)
 	box.AddComponent(codeList)
 	box.AddComponent(drawable)
 	root.Value = box
