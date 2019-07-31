@@ -96,8 +96,9 @@ func (r *Renderer) renderGameObjectNode(node *graph.Node) {
 func (r *Renderer) renderMeshBoxNode(node *graph.Node) {
 	value := node.Value.(*gameobject.GameObject)
 	drawable, _ := value.GetComponent(gameobject.DrawableComponentType)
+	box := drawable.Get().(*mesh.Box)
 	if node.RendererValue == nil {
-		d := drawable.Get().(*mesh.Box).Dimensions
+		d := box.Dimensions
 		geometry := THREE().Get("BoxGeometry").New(d.X, d.Y, d.Z)
 		material := THREE().Get("MeshBasicMaterial").New(map[string]interface{}{
 			"color": 0x00ff00,
@@ -108,6 +109,6 @@ func (r *Renderer) renderMeshBoxNode(node *graph.Node) {
 		return
 	}
 	rot := node.RendererValue.(*js.Object).Get("rotation")
-	rot.Set("x", rot.Get("x").Float()+0.01)
-	rot.Set("y", rot.Get("y").Float()+0.01)
+	rot.Set("x", box.Rotate.X)
+	rot.Set("y", box.Rotate.Y)
 }

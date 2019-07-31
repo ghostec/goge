@@ -6,8 +6,9 @@ import (
 
 type Box struct {
 	Dimensions math.Vec3
+	Rotate     math.Vec3
 }
 
 func NewBox(dimensions math.Vec3) *Box {
-	return &Box{dimensions}
+	return &Box{Dimensions: dimensions}
 }

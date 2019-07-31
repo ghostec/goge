@@ -25,7 +25,10 @@ func main() {
 	code.SetUpdate(func(obj *gameobject.GameObject, elapsed time.Duration) {
 		// TODO: access gameobject.drawable.(*mesh.Box)
 		// change its Rotate Vec3
-		println("here")
+		drawable, _ := obj.GetComponent(gameobject.DrawableComponentType)
+		box := drawable.Get().(*mesh.Box)
+		box.Rotate.X += 0.01
+		box.Rotate.Y += 0.01
 	})
 	codeList.Add(code)
 	box.AddComponent(codeList)
