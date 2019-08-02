@@ -5,7 +5,6 @@ import (
 
 	"github.com/ghostec/goge/game"
 	"github.com/ghostec/goge/gameobject"
-	"github.com/ghostec/goge/math"
 	"github.com/ghostec/goge/mesh"
 	"github.com/ghostec/goge/scene"
 	"github.com/ghostec/goge/three"
@@ -19,16 +18,17 @@ func main() {
 	root := scene.Graph.Root()
 	box := gameobject.New()
 	drawable := gameobject.NewDrawableComponent()
-	drawable.Set(mesh.NewBox(math.Vec3{1, 2, 0.5}))
+	drawable.Set(mesh.NewBox())
 	codeList := gameobject.NewCodeListComponent()
 	code := gameobject.NewSimpleCodeComponent("rotate_cube")
+	code.SetInit(func(obj *gameobject.GameObject) {
+		obj.Transform.Scale.X = 1
+		obj.Transform.Scale.Y = 2
+		obj.Transform.Scale.Z = 0.5
+	})
 	code.SetUpdate(func(obj *gameobject.GameObject, elapsed time.Duration) {
-		// TODO: access gameobject.drawable.(*mesh.Box)
-		// change its Rotate Vec3
-		drawable, _ := obj.GetComponent(gameobject.DrawableComponentType)
-		box := drawable.Get().(*mesh.Box)
-		box.Rotate.X += 0.01
-		box.Rotate.Y += 0.01
+		obj.Transform.Rotate.X += 0.01
+		obj.Transform.Rotate.Y += 0.01
 	})
 	codeList.Add(code)
 	box.AddComponent(codeList)

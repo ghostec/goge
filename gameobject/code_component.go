@@ -6,14 +6,14 @@ import (
 
 type CodeComponent interface {
 	Initialized() bool
-	Init()
+	Init(obj *GameObject)
 	Update(obj *GameObject, elapsed time.Duration)
 }
 
 type SimpleCodeComponent struct {
 	name        string
 	initialized bool
-	initFunc    func()
+	initFunc    func(*GameObject)
 	updateFunc  func(*GameObject, time.Duration)
 }
 
@@ -21,9 +21,9 @@ func NewSimpleCodeComponent(name string) *SimpleCodeComponent {
 	return &SimpleCodeComponent{name: name}
 }
 
-func (c *SimpleCodeComponent) Init() {
+func (c *SimpleCodeComponent) Init(obj *GameObject) {
 	if c.initFunc != nil {
-		c.initFunc()
+		c.initFunc(obj)
 	}
 	c.initialized = true
 }
@@ -42,6 +42,6 @@ func (c *SimpleCodeComponent) SetUpdate(f func(*GameObject, time.Duration)) {
 	c.updateFunc = f
 }
 
-func (c *SimpleCodeComponent) SetInit(f func()) {
+func (c *SimpleCodeComponent) SetInit(f func(*GameObject)) {
 	c.initFunc = f
 }

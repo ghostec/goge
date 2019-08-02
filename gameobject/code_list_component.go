@@ -45,6 +45,6 @@ func (cl *CodeListComponent) Update(obj *GameObject, elapsed time.Duration) {
 			cc.Update(obj, elapsed)
 			return
 		}
-		cc.Init()
+		cc.Init(obj)
 	}
 }

@@ -9,6 +9,7 @@ import (
 type GameObject struct {
 	uuid       uuid.UUID
 	components map[ComponentType]Component
+	Transform
 }
 
 func New() *GameObject {

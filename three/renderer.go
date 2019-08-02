@@ -94,21 +94,23 @@ func (r *Renderer) renderGameObjectNode(node *graph.Node) {
 }
 
 func (r *Renderer) renderMeshBoxNode(node *graph.Node) {
-	value := node.Value.(*gameobject.GameObject)
-	drawable, _ := value.GetComponent(gameobject.DrawableComponentType)
-	box := drawable.Get().(*mesh.Box)
 	if node.RendererValue == nil {
-		d := box.Dimensions
-		geometry := THREE().Get("BoxGeometry").New(d.X, d.Y, d.Z)
+		geometry := THREE().Get("BoxGeometry").New(1, 1, 1)
 		material := THREE().Get("MeshBasicMaterial").New(map[string]interface{}{
 			"color": 0x00ff00,
 		})
 		cube := THREE().Get("Mesh").New(geometry, material)
 		node.RendererValue = cube
 		r.tscene.it.Call("add", cube)
-		return
 	}
-	rot := node.RendererValue.(*js.Object).Get("rotation")
-	rot.Set("x", box.Rotate.X)
-	rot.Set("y", box.Rotate.Y)
+	obj := node.Value.(*gameobject.GameObject)
+	mesh := node.RendererValue.(*js.Object)
+	rotation := mesh.Get("rotation")
+	rotation.Set("x", obj.Transform.Rotate.X)
+	rotation.Set("y", obj.Transform.Rotate.Y)
+	rotation.Set("z", obj.Transform.Rotate.Z)
+	scale := mesh.Get("scale")
+	scale.Set("x", obj.Transform.Scale.X)
+	scale.Set("y", obj.Transform.Scale.Y)
+	scale.Set("z", obj.Transform.Scale.Z)
 }
