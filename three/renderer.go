@@ -33,6 +33,7 @@ func NewRenderer() *Renderer {
 }
 
 func (r *Renderer) Update(elapsed time.Duration) error {
+	r.refreshScreen()
 	r.Render()
 	return nil
 }
@@ -48,12 +49,21 @@ func (r *Renderer) Render() error {
 
 func (r *Renderer) SetScreen(screen renderer.Screen) {
 	r.screen = screen.(*Screen)
-	w := screen.Width()
-	h := screen.Height()
+	r.refreshScreen()
+}
+
+func (r *Renderer) refreshScreen() {
+	w := r.screen.Width()
+	h := r.screen.Height()
+	if w == r.previousScreenWidth && h == r.previousScreenHeight {
+		return
+	}
 	r.it.Call("setSize", w, h)
 	if r.camera != nil {
 		r.camera.SetAspectRatio(w / h)
 	}
+	r.previousScreenWidth = w
+	r.previousScreenHeight = h
 }
 
 func (r *Renderer) SetCamera(camera camera.Camera) {
