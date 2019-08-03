@@ -89,23 +89,37 @@ func (r *Renderer) renderNode(node *graph.Node) {
 }
 
 func (r *Renderer) renderGameObjectNode(node *graph.Node) {
-	value := node.Value.(*gameobject.GameObject)
-	drawable, ok := value.GetComponent(gameobject.DrawableComponentType)
+	obj := node.Value.(*gameobject.GameObject)
+	drawable, ok := obj.GetComponent(gameobject.DrawableComponentType)
 	if !ok {
 		return
 	}
 	switch drawable.Get().(type) {
-	case *mesh.Box:
-		r.renderMeshBoxNode(node)
+	case *mesh.Mesh:
+		r.renderMeshNode(node)
 	default:
 		// unknown drawable type
 		return
 	}
 }
 
-func (r *Renderer) renderMeshBoxNode(node *graph.Node) {
+func (r *Renderer) renderMeshNode(node *graph.Node) {
+	obj := node.Value.(*gameobject.GameObject)
 	if node.RendererValue == nil {
-		geometry := THREE().Get("BoxGeometry").New(1, 1, 1)
+		drawable, _ := obj.GetComponent(gameobject.DrawableComponentType)
+		nvs := drawable.Get().(*mesh.Mesh).Geometry.Vertices()
+		gvs := make([]interface{}, len(nvs))
+		for i := range nvs {
+			gvs[i] = THREE().Get("Vector3").New(nvs[i].X, nvs[i].Y, nvs[i].Z)
+		}
+		nfs := drawable.Get().(*mesh.Mesh).Geometry.Faces()
+		gfs := make([]interface{}, len(nfs))
+		for i := range nfs {
+			gfs[i] = THREE().Get("Face3").New(nfs[i].X, nfs[i].Y, nfs[i].Z)
+		}
+		geometry := THREE().Get("Geometry").New()
+		geometry.Get("vertices").Call("push", gvs...)
+		geometry.Get("faces").Call("push", gfs...)
 		material := THREE().Get("MeshBasicMaterial").New(map[string]interface{}{
 			"color": 0x00ff00,
 		})
@@ -113,7 +127,6 @@ func (r *Renderer) renderMeshBoxNode(node *graph.Node) {
 		node.RendererValue = cube
 		r.tscene.it.Call("add", cube)
 	}
-	obj := node.Value.(*gameobject.GameObject)
 	mesh := node.RendererValue.(*js.Object)
 	rotation := mesh.Get("rotation")
 	rotation.Set("x", obj.Transform.Rotate.X)

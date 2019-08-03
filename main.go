@@ -14,11 +14,26 @@ import (
 func main() {
 	camera := three.NewCamera(50, 1, 0.1, 1000)
 	screen := three.NewScreen()
+	renderer := three.NewRenderer()
+	renderer.SetCamera(camera)
+	renderer.SetScreen(screen)
+	// TODO: scene should be in scene? (how would the game change it?)
+	scene := buildScene()
+	c := game.Config{
+		MaxFPS:   30,
+		Renderer: renderer,
+		Scene:    scene,
+	}
+	g := game.New(c)
+	go g.Loop()
+	js.Global.Set("goge", map[string]interface{}{
+		"Ready": three.Ready,
+	})
+}
+
+func buildScene() *scene.Scene {
 	scene := scene.New()
-	root := scene.Graph.Root()
 	box := gameobject.New()
-	drawable := gameobject.NewDrawableComponent()
-	drawable.Set(mesh.NewBox())
 	codeList := gameobject.NewCodeListComponent()
 	code := gameobject.NewSimpleCodeComponent("rotate_cube")
 	code.SetInit(func(obj *gameobject.GameObject) {
@@ -32,19 +47,12 @@ func main() {
 	})
 	codeList.Add(code)
 	box.AddComponent(codeList)
+	drawable := gameobject.NewDrawableComponent()
+	m := mesh.New()
+	m.Geometry = mesh.NewBox()
+	drawable.Set(m)
 	box.AddComponent(drawable)
+	root := scene.Graph.Root()
 	root.Value = box
-	renderer := three.NewRenderer()
-	renderer.SetCamera(camera)
-	renderer.SetScreen(screen)
-	c := game.Config{
-		MaxFPS:   30,
-		Renderer: renderer,
-		Scene:    scene,
-	}
-	g := game.New(c)
-	go g.Loop()
-	js.Global.Set("goge", map[string]interface{}{
-		"Ready": three.Ready,
-	})
+	return scene
 }
