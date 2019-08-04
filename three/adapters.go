@@ -20,10 +20,9 @@ func fromMesh(m *mesh.Mesh) *js.Object {
 	geometry := THREE().Get("Geometry").New()
 	geometry.Get("vertices").Call("push", gvs...)
 	geometry.Get("faces").Call("push", gfs...)
-	// geometry.Call("computeFaceNormals")
-	// geometry.Call("computeVertexNormals")
 	material := THREE().Get("MeshNormalMaterial").New()
-	return THREE().Get("Mesh").New(geometry, material)
+	mjs := THREE().Get("Mesh").New(geometry, material)
+	return mjs
 }
 
 func fromVertex(v mesh.Vertex) *js.Object {

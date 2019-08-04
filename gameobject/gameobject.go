@@ -3,6 +3,7 @@ package gameobject
 import (
 	"fmt"
 
+	"github.com/ghostec/goge/math"
 	"github.com/google/uuid"
 )
 
@@ -17,6 +18,7 @@ func New() *GameObject {
 	return &GameObject{
 		uuid:       uuid,
 		components: map[ComponentType]Component{},
+		Transform:  Transform{Scale: math.Vec3{1, 1, 1}},
 	}
 }
 

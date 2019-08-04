@@ -29,17 +29,17 @@ func NewBox(width, height, length float64) *Box {
 		Face{Vertices: [3]int64{2, 7, 3}},
 		Face{Vertices: [3]int64{2, 6, 7}},
 		// bottom
-		Face{Vertices: [3]int64{4, 7, 5}},
-		Face{Vertices: [3]int64{5, 7, 6}},
+		Face{Vertices: [3]int64{7, 5, 4}},
+		Face{Vertices: [3]int64{7, 6, 5}},
 		// left
 		Face{Vertices: [3]int64{4, 5, 0}},
 		Face{Vertices: [3]int64{5, 1, 0}},
 		// back
 		Face{Vertices: [3]int64{5, 2, 1}},
-		Face{Vertices: [3]int64{2, 5, 6}},
+		Face{Vertices: [3]int64{5, 6, 2}},
 		// front
-		Face{Vertices: [3]int64{0, 7, 3}},
-		Face{Vertices: [3]int64{0, 4, 7}},
+		Face{Vertices: [3]int64{0, 3, 7}},
+		Face{Vertices: [3]int64{0, 7, 4}},
 	}
 	calculateFacesAndVerticesNormals(vertices, faces)
 	return &Box{

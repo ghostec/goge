@@ -15,7 +15,7 @@ func NewCamera(fov, ar, near, far float64) *Camera {
 	c := &Camera{
 		it: THREE().Get("PerspectiveCamera").New(fov, ar, near, far),
 	}
-	c.it.Get("position").Set("z", 5)
+	c.it.Get("position").Set("z", 40)
 	return c
 }
 

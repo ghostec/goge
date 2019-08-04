@@ -122,4 +122,8 @@ func (r *Renderer) renderMeshNode(node *graph.Node) {
 	scale.Set("x", obj.Transform.Scale.X)
 	scale.Set("y", obj.Transform.Scale.Y)
 	scale.Set("z", obj.Transform.Scale.Z)
+	position := mesh.Get("position")
+	position.Set("x", obj.Transform.Translate.X)
+	position.Set("y", obj.Transform.Translate.Y)
+	position.Set("z", obj.Transform.Translate.Z)
 }
