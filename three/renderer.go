@@ -23,7 +23,9 @@ type Renderer struct {
 }
 
 func NewRenderer() *Renderer {
-	it := THREE().Get("WebGLRenderer").New()
+	it := THREE().Get("WebGLRenderer").New(map[string]interface{}{
+		"antialias": true,
+	})
 	// TODO: Attach instead of doing it on ctor
 	js.Global.Get("document").Get("body").Call("appendChild", it.Get("domElement"))
 	return &Renderer{
@@ -107,25 +109,9 @@ func (r *Renderer) renderMeshNode(node *graph.Node) {
 	obj := node.Value.(*gameobject.GameObject)
 	if node.RendererValue == nil {
 		drawable, _ := obj.GetComponent(gameobject.DrawableComponentType)
-		nvs := drawable.Get().(*mesh.Mesh).Geometry.Vertices()
-		gvs := make([]interface{}, len(nvs))
-		for i := range nvs {
-			gvs[i] = THREE().Get("Vector3").New(nvs[i].X, nvs[i].Y, nvs[i].Z)
-		}
-		nfs := drawable.Get().(*mesh.Mesh).Geometry.Faces()
-		gfs := make([]interface{}, len(nfs))
-		for i := range nfs {
-			gfs[i] = THREE().Get("Face3").New(nfs[i].X, nfs[i].Y, nfs[i].Z)
-		}
-		geometry := THREE().Get("Geometry").New()
-		geometry.Get("vertices").Call("push", gvs...)
-		geometry.Get("faces").Call("push", gfs...)
-		material := THREE().Get("MeshBasicMaterial").New(map[string]interface{}{
-			"color": 0x00ff00,
-		})
-		cube := THREE().Get("Mesh").New(geometry, material)
-		node.RendererValue = cube
-		r.tscene.it.Call("add", cube)
+		m := fromMesh(drawable.Get().(*mesh.Mesh))
+		node.RendererValue = m
+		r.tscene.it.Call("add", m)
 	}
 	mesh := node.RendererValue.(*js.Object)
 	rotation := mesh.Get("rotation")

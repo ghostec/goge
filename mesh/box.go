@@ -6,33 +6,46 @@ type Box struct {
 	*SimpleGeometry
 }
 
-func NewBox() *Box {
+// NewBox creates a box with (x, y, z) dimensions (width, height, length)
+func NewBox(width, height, length float64) *Box {
+	halfWidth, halfHeight, halfLength := width*0.5, height*0.5, length*0.5
+	vertices := []Vertex{
+		// up plane
+		Vertex{Position: math.Vec3{-halfWidth, halfHeight, -halfLength}},
+		Vertex{Position: math.Vec3{-halfWidth, halfHeight, halfLength}},
+		Vertex{Position: math.Vec3{halfWidth, halfHeight, halfLength}},
+		Vertex{Position: math.Vec3{halfWidth, halfHeight, -halfLength}},
+		// down plane
+		Vertex{Position: math.Vec3{-halfWidth, -halfHeight, -halfLength}},
+		Vertex{Position: math.Vec3{-halfWidth, -halfHeight, halfLength}},
+		Vertex{Position: math.Vec3{halfWidth, -halfHeight, halfLength}},
+		Vertex{Position: math.Vec3{halfWidth, -halfHeight, -halfLength}},
+	}
+	faces := []Face{
+		// top
+		Face{Vertices: [3]int64{0, 1, 2}},
+		Face{Vertices: [3]int64{0, 2, 3}},
+		// right
+		Face{Vertices: [3]int64{2, 7, 3}},
+		Face{Vertices: [3]int64{2, 6, 7}},
+		// bottom
+		Face{Vertices: [3]int64{4, 7, 5}},
+		Face{Vertices: [3]int64{5, 7, 6}},
+		// left
+		Face{Vertices: [3]int64{4, 5, 0}},
+		Face{Vertices: [3]int64{5, 1, 0}},
+		// back
+		Face{Vertices: [3]int64{5, 2, 1}},
+		Face{Vertices: [3]int64{2, 5, 6}},
+		// front
+		Face{Vertices: [3]int64{0, 7, 3}},
+		Face{Vertices: [3]int64{0, 4, 7}},
+	}
+	calculateFacesAndVerticesNormals(vertices, faces)
 	return &Box{
 		SimpleGeometry: &SimpleGeometry{
-			vertices: []math.Vec3{
-				math.Vec3{X: 0.5, Y: 0.5, Z: 0.5},
-				math.Vec3{X: 0.5, Y: 0.5, Z: -0.5},
-				math.Vec3{X: 0.5, Y: -0.5, Z: 0.5},
-				math.Vec3{X: 0.5, Y: -0.5, Z: -0.5},
-				math.Vec3{X: -0.5, Y: 0.5, Z: -0.5},
-				math.Vec3{X: -0.5, Y: 0.5, Z: 0.5},
-				math.Vec3{X: -0.5, Y: -0.5, Z: -0.5},
-				math.Vec3{X: -0.5, Y: -0.5, Z: 0.5},
-			},
-			faces: []math.Vec3{
-				math.Vec3{X: 0, Y: 2, Z: 1},
-				math.Vec3{X: 2, Y: 3, Z: 1},
-				math.Vec3{X: 4, Y: 6, Z: 5},
-				math.Vec3{X: 6, Y: 7, Z: 5},
-				math.Vec3{X: 4, Y: 5, Z: 1},
-				math.Vec3{X: 5, Y: 0, Z: 1},
-				math.Vec3{X: 7, Y: 6, Z: 2},
-				math.Vec3{X: 6, Y: 3, Z: 2},
-				math.Vec3{X: 5, Y: 7, Z: 0},
-				math.Vec3{X: 7, Y: 2, Z: 0},
-				math.Vec3{X: 1, Y: 3, Z: 4},
-				math.Vec3{X: 3, Y: 6, Z: 4},
-			},
+			vertices: vertices,
+			faces:    faces,
 		},
 	}
 }

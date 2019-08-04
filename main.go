@@ -49,7 +49,7 @@ func buildScene() *scene.Scene {
 	box.AddComponent(codeList)
 	drawable := gameobject.NewDrawableComponent()
 	m := mesh.New()
-	m.Geometry = mesh.NewBox()
+	m.Geometry = mesh.NewBox(1, 1, 1)
 	drawable.Set(m)
 	box.AddComponent(drawable)
 	root := scene.Graph.Root()
