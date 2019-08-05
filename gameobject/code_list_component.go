@@ -1,50 +1,43 @@
 package gameobject
 
 import (
-	"fmt"
-	"time"
+	"github.com/ghostec/goge/store"
+	"github.com/google/uuid"
 )
+
+const CodeListComponentType = ComponentType("gameobject.component.CodeList")
 
 type CodeListComponent struct {
 	*CustomComponent
+	codeStore *store.Store
 }
 
 func NewCodeListComponent() *CodeListComponent {
-	cl := &CodeListComponent{&CustomComponent{ct: CodeListComponentType}}
-	cl.CustomComponent.value = make([]CodeComponent, 0)
+	cl := &CodeListComponent{
+		CustomComponent: &CustomComponent{ct: CodeListComponentType},
+		codeStore:       store.New(),
+	}
 	return cl
 }
 
-func (cl *CodeListComponent) Add(code CodeComponent) {
-	sl := cl.value.([]CodeComponent)
-	cl.value = append(sl, code)
+func (cl *CodeListComponent) Add(code CodeComponent) CodeComponentKey {
+	uuid, _ := uuid.NewRandom()
+	key := CodeComponentKey(uuid.String())
+	cl.codeStore.Set(store.Key(key), code)
+	return key
 }
 
-func (cl *CodeListComponent) Remove(code CodeComponent) error {
-	sl := cl.value.([]CodeComponent)
-	idx := -1
-	for i, cc := range sl {
-		if cc == code {
-			idx = i
-			break
-		}
-	}
-	if idx == -1 {
-		return fmt.Errorf("CodeListComponent doesn't have Code sent for removal")
-	}
-	sl[idx] = sl[len(sl)-1]
-	sl = sl[:len(sl)-1]
-	cl.value = sl
-	return nil
+func (cl *CodeListComponent) Remove(key CodeComponentKey) {
+	cl.codeStore.Unset(store.Key(key))
 }
 
-func (cl *CodeListComponent) Update(obj *GameObject, elapsed time.Duration) {
-	sl := cl.value.([]CodeComponent)
-	for _, cc := range sl {
+func (cl *CodeListComponent) Update(ctx *Context) {
+	for _, c := range cl.codeStore.All() {
+		cc := c.(CodeComponent)
 		if cc.Initialized() {
-			cc.Update(obj, elapsed)
+			cc.Update(ctx)
 			return
 		}
-		cc.Init(obj)
+		cc.Init(ctx)
 	}
 }

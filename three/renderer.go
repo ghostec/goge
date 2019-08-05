@@ -9,6 +9,7 @@ import (
 	"github.com/ghostec/goge/renderer"
 	"github.com/ghostec/goge/scene"
 	"github.com/ghostec/goge/scene/graph"
+	"github.com/ghostec/goge/store"
 	"github.com/gopherjs/gopherjs/js"
 )
 
@@ -92,7 +93,7 @@ func (r *Renderer) renderNode(node *graph.Node) {
 
 func (r *Renderer) renderGameObjectNode(node *graph.Node) {
 	obj := node.Value.(*gameobject.GameObject)
-	drawable, ok := obj.GetComponent(gameobject.DrawableComponentType)
+	drawable, ok := obj.Get(gameobject.DrawableComponentType)
 	if !ok {
 		return
 	}
@@ -105,15 +106,19 @@ func (r *Renderer) renderGameObjectNode(node *graph.Node) {
 	}
 }
 
+const RendererValueKey = store.Key("three.RendererValue")
+
 func (r *Renderer) renderMeshNode(node *graph.Node) {
 	obj := node.Value.(*gameobject.GameObject)
-	if node.RendererValue == nil {
-		drawable, _ := obj.GetComponent(gameobject.DrawableComponentType)
+	rv := node.Get(RendererValueKey)
+	if rv == nil {
+		drawable, _ := obj.Get(gameobject.DrawableComponentType)
 		m := fromMesh(drawable.Get().(*mesh.Mesh))
-		node.RendererValue = m
+		node.Set(RendererValueKey, m)
 		r.tscene.it.Call("add", m)
+		rv = m
 	}
-	mesh := node.RendererValue.(*js.Object)
+	mesh := rv.(*js.Object)
 	rotation := mesh.Get("rotation")
 	rotation.Set("x", obj.Transform.Rotate.X)
 	rotation.Set("y", obj.Transform.Rotate.Y)

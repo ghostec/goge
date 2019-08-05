@@ -37,7 +37,8 @@ func (g *Game) Loop() {
 		now = time.Now()
 		elapsed = now.Sub(last)
 		last = now
-		g.updateState(elapsed)
+		// TODO: update scene graph -> apply transform matrix BFS order
+		g.update(elapsed)
 		g.renderer.Update(elapsed)
 		// guarantees MaxFPS
 		after = time.Now()
@@ -52,16 +53,14 @@ func (g *Game) Loop() {
 	}
 }
 
-func (g Game) updateState(elapsed time.Duration) {
+func (g Game) update(elapsed time.Duration) {
 	bfs := g.scene.Graph.BFS()
+	ctx := gameobject.NewContext()
+	ctx.Elapsed = elapsed
 	for _, node := range bfs {
 		switch v := node.Value.(type) {
 		case *gameobject.GameObject:
-			codeList, ok := v.GetComponent(gameobject.CodeListComponentType)
-			if !ok {
-				continue
-			}
-			codeList.(*gameobject.CodeListComponent).Update(v, elapsed)
+			v.Update(ctx)
 		}
 	}
 }

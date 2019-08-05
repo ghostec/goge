@@ -1,14 +1,16 @@
 package gameobject
 
 import (
-	"time"
+	"github.com/ghostec/goge/store"
 )
+
+type ComponentType store.Key
 
 type Component interface {
 	Get() interface{}
 	Set(interface{})
 	Type() ComponentType
-	Update(obj *GameObject, elapsed time.Duration)
+	Update(*Context)
 }
 
 type CustomComponent struct {
@@ -28,6 +30,6 @@ func (c *CustomComponent) Set(value interface{}) {
 	c.value = value
 }
 
-func (c *CustomComponent) Update(obj *GameObject, elapsed time.Duration) {
+func (c *CustomComponent) Update(*Context) {
 	return
 }

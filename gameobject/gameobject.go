@@ -1,15 +1,14 @@
 package gameobject
 
 import (
-	"fmt"
-
 	"github.com/ghostec/goge/math"
+	"github.com/ghostec/goge/store"
 	"github.com/google/uuid"
 )
 
 type GameObject struct {
 	uuid       uuid.UUID
-	components map[ComponentType]Component
+	components *store.Store
 	Transform
 }
 
@@ -17,28 +16,30 @@ func New() *GameObject {
 	uuid, _ := uuid.NewRandom()
 	return &GameObject{
 		uuid:       uuid,
-		components: map[ComponentType]Component{},
+		components: store.New(),
 		Transform:  Transform{Scale: math.Vec3{1, 1, 1}},
 	}
 }
 
-func (o *GameObject) AddComponent(c Component) error {
-	if _, ok := o.components[c.Type()]; ok {
-		return fmt.Errorf("GameObject %s already has component with type %s", o.uuid, c.Type())
+func (o *GameObject) Update(ctx *Context) {
+	ctx.GameObject = o
+	for _, c := range o.components.All() {
+		c.(Component).Update(ctx)
 	}
-	o.components[c.Type()] = c
-	return nil
 }
 
-func (o *GameObject) RemoveComponent(c Component) error {
-	if _, ok := o.components[c.Type()]; !ok {
-		return fmt.Errorf("GameObject %s has no component with type %s", o.uuid, c.Type())
+func (o GameObject) Get(ct ComponentType) (Component, bool) {
+	c := o.components.Get(store.Key(ct))
+	if c == nil {
+		return nil, false
 	}
-	delete(o.components, c.Type())
-	return nil
+	return c.(Component), true
 }
 
-func (o GameObject) GetComponent(ct ComponentType) (Component, bool) {
-	c, ok := o.components[ct]
-	return c, ok
+func (o *GameObject) Set(c Component) {
+	o.components.Set(store.Key(c.Type()), c)
+}
+
+func (o *GameObject) Unset(ct ComponentType) {
+	o.components.Unset(store.Key(ct))
 }

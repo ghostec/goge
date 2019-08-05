@@ -36,23 +36,23 @@ func buildScene1() *scene.Scene {
 	scene := scene.New()
 	box := gameobject.New()
 	codeList := gameobject.NewCodeListComponent()
-	code := gameobject.NewSimpleCodeComponent("rotate_cube")
-	code.SetInit(func(obj *gameobject.GameObject) {
-		obj.Transform.Scale.X = 1
-		obj.Transform.Scale.Y = 2
-		obj.Transform.Scale.Z = 0.5
+	code := gameobject.NewSimpleCodeComponent()
+	code.SetInit(func(ctx *gameobject.Context) {
+		ctx.GameObject.Transform.Scale.X = 1
+		ctx.GameObject.Transform.Scale.Y = 2
+		ctx.GameObject.Transform.Scale.Z = 0.5
 	})
-	code.SetUpdate(func(obj *gameobject.GameObject, elapsed time.Duration) {
-		obj.Transform.Rotate.X += 0.01
-		obj.Transform.Rotate.Y += 0.01
+	code.SetUpdate(func(ctx *gameobject.Context) {
+		ctx.GameObject.Transform.Rotate.X += 0.01
+		ctx.GameObject.Transform.Rotate.Y += 0.01
 	})
 	codeList.Add(code)
-	box.AddComponent(codeList)
+	box.Set(codeList)
 	drawable := gameobject.NewDrawableComponent()
 	m := mesh.New()
 	m.Geometry = mesh.NewBox(1, 1, 1)
 	drawable.Set(m)
-	box.AddComponent(drawable)
+	box.Set(drawable)
 	root := scene.Graph.Root()
 	root.Value = box
 	return scene
@@ -73,7 +73,7 @@ func buildScene2() *scene.Scene {
 		m := mesh.New()
 		m.Geometry = mesh.NewBox(1, 1, 1)
 		drawable.Set(m)
-		box.AddComponent(drawable)
+		box.Set(drawable)
 		c := root.NewChild()
 		c.Value = box
 	}

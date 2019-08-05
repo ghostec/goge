@@ -1,29 +1,30 @@
 package gameobject
 
 import (
-	"time"
+	"github.com/ghostec/goge/store"
 )
+
+type CodeComponentKey store.Key
 
 type CodeComponent interface {
 	Initialized() bool
-	Init(obj *GameObject)
-	Update(obj *GameObject, elapsed time.Duration)
+	Init(*Context)
+	Update(*Context)
 }
 
 type SimpleCodeComponent struct {
-	name        string
 	initialized bool
-	initFunc    func(*GameObject)
-	updateFunc  func(*GameObject, time.Duration)
+	initFunc    func(*Context)
+	updateFunc  func(*Context)
 }
 
-func NewSimpleCodeComponent(name string) *SimpleCodeComponent {
-	return &SimpleCodeComponent{name: name}
+func NewSimpleCodeComponent() *SimpleCodeComponent {
+	return &SimpleCodeComponent{}
 }
 
-func (c *SimpleCodeComponent) Init(obj *GameObject) {
+func (c *SimpleCodeComponent) Init(ctx *Context) {
 	if c.initFunc != nil {
-		c.initFunc(obj)
+		c.initFunc(ctx)
 	}
 	c.initialized = true
 }
@@ -32,16 +33,16 @@ func (c SimpleCodeComponent) Initialized() bool {
 	return c.initialized
 }
 
-func (c *SimpleCodeComponent) Update(obj *GameObject, elapsed time.Duration) {
+func (c *SimpleCodeComponent) Update(ctx *Context) {
 	if c.updateFunc != nil {
-		c.updateFunc(obj, elapsed)
+		c.updateFunc(ctx)
 	}
 }
 
-func (c *SimpleCodeComponent) SetUpdate(f func(*GameObject, time.Duration)) {
+func (c *SimpleCodeComponent) SetUpdate(f func(*Context)) {
 	c.updateFunc = f
 }
 
-func (c *SimpleCodeComponent) SetInit(f func(*GameObject)) {
+func (c *SimpleCodeComponent) SetInit(f func(*Context)) {
 	c.initFunc = f
 }

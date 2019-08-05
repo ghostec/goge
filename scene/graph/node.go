@@ -3,14 +3,16 @@ package graph
 import (
 	"fmt"
 
+	"github.com/ghostec/goge/store"
 	"github.com/google/uuid"
 )
 
 type Node struct {
-	uuid          uuid.UUID
-	Value         interface{}
-	RendererValue interface{}
-	children      map[uuid.UUID]*Node
+	uuid     uuid.UUID
+	children map[uuid.UUID]*Node
+	Value    interface{}
+	*store.Store
+	// TODO: add transform matrix and update it when BFS runs
 }
 
 func NewNode() *Node {
@@ -18,6 +20,7 @@ func NewNode() *Node {
 	return &Node{
 		uuid:     u,
 		children: map[uuid.UUID]*Node{},
+		Store:    store.New(),
 	}
 }
 
