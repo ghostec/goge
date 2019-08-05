@@ -32,7 +32,7 @@ func (cl *CodeListComponent) Remove(key CodeComponentKey) {
 }
 
 func (cl *CodeListComponent) Update(ctx *Context) {
-	for _, c := range cl.codeStore.All() {
+	for _, c := range cl.codeStore.Values() {
 		cc := c.(CodeComponent)
 		if cc.Initialized() {
 			cc.Update(ctx)

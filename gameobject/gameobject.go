@@ -23,7 +23,7 @@ func New() *GameObject {
 
 func (o *GameObject) Update(ctx *Context) {
 	ctx.GameObject = o
-	for _, c := range o.components.All() {
+	for _, c := range o.components.Values() {
 		c.(Component).Update(ctx)
 	}
 }
