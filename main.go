@@ -4,6 +4,7 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/ghostec/goge/event"
 	"github.com/ghostec/goge/game"
 	"github.com/ghostec/goge/gameobject"
 	"github.com/ghostec/goge/mesh"
@@ -19,7 +20,7 @@ func main() {
 	renderer.SetCamera(camera)
 	renderer.SetScreen(screen)
 	// TODO: scene should be in scene? (how would the game change it?)
-	scene := buildScene2()
+	scene := buildScene1()
 	c := game.Config{
 		MaxFPS:   60,
 		Renderer: renderer,
@@ -37,7 +38,12 @@ func buildScene1() *scene.Scene {
 	box := gameobject.New()
 	codeList := gameobject.NewCodeListComponent()
 	code := gameobject.NewSimpleCodeComponent()
+	someEventKey := event.Key("some_event")
 	code.SetInit(func(ctx *gameobject.Context) {
+		ctx.Dispatcher.Subscribe(ctx.GameObject, someEventKey, func(e *event.Event) {
+			println(e.Key())
+		})
+		ctx.Dispatcher.Dispatch(event.New(someEventKey))
 		ctx.GameObject.Transform.Scale.X = 1
 		ctx.GameObject.Transform.Scale.Y = 2
 		ctx.GameObject.Transform.Scale.Z = 0.5

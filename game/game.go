@@ -4,22 +4,25 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/ghostec/goge/event"
 	"github.com/ghostec/goge/gameobject"
 	"github.com/ghostec/goge/renderer"
 	"github.com/ghostec/goge/scene"
 )
 
 type Game struct {
+	dispatcher  *event.Dispatcher
+	minInterval time.Duration
 	renderer    renderer.Renderer
 	scene       *scene.Scene
-	minInterval time.Duration
 }
 
 func New(config Config) *Game {
 	g := &Game{
-		scene:       config.Scene,
+		dispatcher:  event.NewDispatcher(),
 		minInterval: time.Millisecond * time.Duration(float64(1000)/float64(config.GetMaxFPS())),
 		renderer:    config.Renderer,
+		scene:       config.Scene,
 	}
 	if g.renderer != nil {
 		g.renderer.SetScene(g.scene)
@@ -54,9 +57,11 @@ func (g *Game) Loop() {
 }
 
 func (g Game) update(elapsed time.Duration) {
+	g.dispatcher.Process()
 	bfs := g.scene.Graph.BFS()
 	ctx := gameobject.NewContext()
 	ctx.Elapsed = elapsed
+	ctx.Dispatcher = g.dispatcher
 	for _, node := range bfs {
 		switch v := node.Value.(type) {
 		case *gameobject.GameObject:
