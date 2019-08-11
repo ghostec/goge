@@ -39,6 +39,10 @@ func (r *Renderer) Update(elapsed time.Duration) error {
 	return nil
 }
 
+func (r Renderer) Camera() camera.Camera {
+	return r.camera
+}
+
 func (r *Renderer) Render() error {
 	bfs := r.scene.Graph.BFS()
 	for _, node := range bfs {

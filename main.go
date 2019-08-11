@@ -7,6 +7,7 @@ import (
 	"github.com/ghostec/goge/event"
 	"github.com/ghostec/goge/game"
 	"github.com/ghostec/goge/gameobject"
+	"github.com/ghostec/goge/math"
 	"github.com/ghostec/goge/mesh"
 	"github.com/ghostec/goge/scene"
 	"github.com/ghostec/goge/three"
@@ -14,11 +15,14 @@ import (
 )
 
 const (
-	AddBoxEvent = event.Key("add_box")
+	AddBoxEvent  = event.Key("add_box")
+	ZoomInEvent  = event.Key("zoom_in")
+	ZoomOutEvent = event.Key("zoom_out")
 )
 
 func main() {
 	camera := three.NewCamera(60, 1, 1, 10000)
+	camera.SetPosition(math.Vec3{0, 0, 5})
 	screen := three.NewScreen(js.Global.Get("document").Call("getElementById", "screen"))
 	renderer := three.NewRenderer()
 	renderer.SetCamera(camera)
@@ -35,37 +39,40 @@ func main() {
 	buildEditor(g)
 	go g.Loop()
 	js.Global.Set("goge", map[string]interface{}{
-		"Ready":       three.Ready,
-		"Dispatch":    func(key string) { g.Dispatcher().Dispatch(event.New(event.Key(key))) },
-		"AddBoxEvent": AddBoxEvent,
+		"Ready":        three.Ready,
+		"Dispatch":     func(key string) { g.Dispatcher().Dispatch(event.New(event.Key(key))) },
+		"AddBoxEvent":  AddBoxEvent,
+		"ZoomInEvent":  ZoomInEvent,
+		"ZoomOutEvent": ZoomOutEvent,
 	})
 }
 
 func buildEditor(game *game.Game) {
-	placebo := 1
+	editorRef := 1
 	dispatcher := game.Dispatcher()
 	scene := game.Scene()
-	dispatcher.Subscribe(&placebo, AddBoxEvent, func(*event.Event) {
-		println("ADD BOX")
+	renderer := game.Renderer()
+	camera := renderer.Camera()
+	dispatcher.Subscribe(&editorRef, ZoomInEvent, func(*event.Event) {
+		pos := camera.Position()
+		at := camera.LookingAt()
+		camera.SetPosition(math.Vec3{
+			pos.X + at.X*0.5,
+			pos.Y + at.Y*0.5,
+			pos.Z + at.Z*0.5,
+		})
+	})
+	dispatcher.Subscribe(&editorRef, ZoomOutEvent, func(*event.Event) {
+		pos := camera.Position()
+		at := camera.LookingAt()
+		camera.SetPosition(math.Vec3{
+			pos.X - at.X*0.5,
+			pos.Y - at.Y*0.5,
+			pos.Z - at.Z*0.5,
+		})
+	})
+	dispatcher.Subscribe(&editorRef, AddBoxEvent, func(*event.Event) {
 		box := gameobject.New()
-		codeList := gameobject.NewCodeListComponent()
-		code := gameobject.NewSimpleCodeComponent()
-		someEventKey := event.Key("some_event")
-		code.SetInit(func(ctx *gameobject.Context) {
-			ctx.Dispatcher.Subscribe(ctx.GameObject, someEventKey, func(e *event.Event) {
-				println(e.Key())
-			})
-			ctx.Dispatcher.Dispatch(event.New(someEventKey))
-			ctx.GameObject.Transform.Scale.X = 1
-			ctx.GameObject.Transform.Scale.Y = 2
-			ctx.GameObject.Transform.Scale.Z = 0.5
-		})
-		code.SetUpdate(func(ctx *gameobject.Context) {
-			ctx.GameObject.Transform.Rotate.X += 0.01
-			ctx.GameObject.Transform.Rotate.Y += 0.01
-		})
-		codeList.Add(code)
-		box.Set(codeList)
 		drawable := gameobject.NewDrawableComponent()
 		m := mesh.New()
 		m.Geometry = mesh.NewBox(1, 1, 1)
