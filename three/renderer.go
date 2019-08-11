@@ -27,8 +27,6 @@ func NewRenderer() *Renderer {
 	it := THREE().Get("WebGLRenderer").New(map[string]interface{}{
 		"antialias": true,
 	})
-	// TODO: Attach instead of doing it on ctor
-	js.Global.Get("document").Get("body").Call("appendChild", it.Get("domElement"))
 	return &Renderer{
 		it:     it,
 		tscene: NewScene(),
@@ -51,8 +49,14 @@ func (r *Renderer) Render() error {
 }
 
 func (r *Renderer) SetScreen(screen renderer.Screen) {
-	r.screen = screen.(*Screen)
-	r.refreshScreen()
+	switch screen := screen.(type) {
+	case *Screen:
+		// TODO: dettach from previous screen
+		attachTo := screen.Input().(*js.Object) // DOM element
+		attachTo.Call("appendChild", r.it.Get("domElement"))
+		r.screen = screen
+		r.refreshScreen()
+	}
 }
 
 func (r *Renderer) refreshScreen() {

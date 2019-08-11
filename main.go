@@ -13,23 +13,65 @@ import (
 	"github.com/gopherjs/gopherjs/js"
 )
 
+const (
+	AddBoxEvent = event.Key("add_box")
+)
+
 func main() {
 	camera := three.NewCamera(60, 1, 1, 10000)
-	screen := three.NewScreen()
+	screen := three.NewScreen(js.Global.Get("document").Call("getElementById", "screen"))
 	renderer := three.NewRenderer()
 	renderer.SetCamera(camera)
 	renderer.SetScreen(screen)
 	// TODO: scene should be in scene? (how would the game change it?)
-	scene := buildScene1()
+	// scene := buildScene1()
+	scene := scene.New() // editor
 	c := game.Config{
 		MaxFPS:   60,
 		Renderer: renderer,
 		Scene:    scene,
 	}
 	g := game.New(c)
+	buildEditor(g)
 	go g.Loop()
 	js.Global.Set("goge", map[string]interface{}{
-		"Ready": three.Ready,
+		"Ready":       three.Ready,
+		"Dispatch":    func(key string) { g.Dispatcher().Dispatch(event.New(event.Key(key))) },
+		"AddBoxEvent": AddBoxEvent,
+	})
+}
+
+func buildEditor(game *game.Game) {
+	placebo := 1
+	dispatcher := game.Dispatcher()
+	scene := game.Scene()
+	dispatcher.Subscribe(&placebo, AddBoxEvent, func(*event.Event) {
+		println("ADD BOX")
+		box := gameobject.New()
+		codeList := gameobject.NewCodeListComponent()
+		code := gameobject.NewSimpleCodeComponent()
+		someEventKey := event.Key("some_event")
+		code.SetInit(func(ctx *gameobject.Context) {
+			ctx.Dispatcher.Subscribe(ctx.GameObject, someEventKey, func(e *event.Event) {
+				println(e.Key())
+			})
+			ctx.Dispatcher.Dispatch(event.New(someEventKey))
+			ctx.GameObject.Transform.Scale.X = 1
+			ctx.GameObject.Transform.Scale.Y = 2
+			ctx.GameObject.Transform.Scale.Z = 0.5
+		})
+		code.SetUpdate(func(ctx *gameobject.Context) {
+			ctx.GameObject.Transform.Rotate.X += 0.01
+			ctx.GameObject.Transform.Rotate.Y += 0.01
+		})
+		codeList.Add(code)
+		box.Set(codeList)
+		drawable := gameobject.NewDrawableComponent()
+		m := mesh.New()
+		m.Geometry = mesh.NewBox(1, 1, 1)
+		drawable.Set(m)
+		box.Set(drawable)
+		scene.Graph.Root().NewChild().Value = box
 	})
 }
 

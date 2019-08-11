@@ -70,12 +70,27 @@ func (g Game) update(elapsed time.Duration) {
 	}
 }
 
-func (g *Game) SetRenderer(r renderer.Renderer) {
-	// TODO: clean something from previous renderer?
-	g.renderer = r
-	g.renderer.SetScene(g.scene)
+func (g Game) Dispatcher() *event.Dispatcher {
+	return g.dispatcher
 }
 
 func (g Game) Renderer() renderer.Renderer {
 	return g.renderer
+}
+
+func (g Game) Scene() *scene.Scene {
+	return g.scene
+}
+
+func (g *Game) SetScene(s *scene.Scene) {
+	g.scene = s
+	if g.renderer != nil {
+		g.renderer.SetScene(s)
+	}
+}
+
+func (g *Game) SetRenderer(r renderer.Renderer) {
+	// TODO: clean something from previous renderer?
+	g.renderer = r
+	g.renderer.SetScene(g.scene)
 }
